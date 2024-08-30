@@ -42,6 +42,12 @@ func (r *ReservationRepository) Create(ctx context.Context, reservation models.R
 	return err
 }
 
+type ReservationData struct {
+	RoomID    string    `json:"room_id"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+}
+
 // GetByRoomID возвращает все бронирования для указанной комнаты
 func (r *ReservationRepository) GetByRoomID(ctx context.Context, roomID string) ([]models.Reservation, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -63,15 +69,24 @@ func (r *ReservationRepository) GetByRoomID(ctx context.Context, roomID string) 
 	}
 	defer rows.Close()
 
-	var reservations []models.Reservation
+	var reservationsData []ReservationData
+
 	for rows.Next() {
-		var res models.Reservation
-		if err := rows.Scan(&res.ID, &res.RoomID, &res.StartTime, &res.EndTime); err != nil {
+		var resData ReservationData
+		if err := rows.Scan(&resData.RoomID, &resData.StartTime, &resData.EndTime); err != nil {
 			return nil, err
+		}
+		reservationsData = append(reservationsData, resData)
+	}
+	var reservations []models.Reservation
+	for _, data := range reservationsData {
+		res := models.Reservation{
+			RoomID:    data.RoomID,
+			StartTime: data.StartTime,
+			EndTime:   data.EndTime,
 		}
 		reservations = append(reservations, res)
 	}
-
 	return reservations, nil
 }
 

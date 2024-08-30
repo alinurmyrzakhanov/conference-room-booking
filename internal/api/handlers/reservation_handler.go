@@ -18,13 +18,15 @@ func NewReservationHandler(service service.ReservationServiceInterface) *Reserva
 	return &ReservationHandler{service: service}
 }
 
+type req struct {
+	RoomID    string    `json:"room_id"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+}
+
 // CreateReservation обрабатывает POST-запрос для создания нового бронирования
 func (h *ReservationHandler) CreateReservation(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		RoomID    string    `json:"room_id"`
-		StartTime time.Time `json:"start_time"`
-		EndTime   time.Time `json:"end_time"`
-	}
+	var req req
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

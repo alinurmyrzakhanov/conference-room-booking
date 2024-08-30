@@ -104,7 +104,6 @@ func TestCreateReservation(t *testing.T) {
 		})
 	}
 }
-
 func TestGetReservations(t *testing.T) {
 	tests := []struct {
 		name             string
