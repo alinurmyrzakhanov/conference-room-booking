@@ -5,13 +5,12 @@
 ## Запуск приложения
 
 1. Скачайте себе репо:
-git clone https://github.com/alinur-rama/conference-room-booking.git
-cd conference-room-booking
+-`git clone https://github.com/alinur-rama/conference-room-booking.git`
+-`cd conference-room-booking`
 
 2. Запуск приложения:
-у вас должен быть установлен docker desktop
-docker-compose up --build
-API будет доступно по адресу `http://localhost:8080`.
+-`make docker-build`
+-`make docker-up`.
 
 ## API Endpoints
 
@@ -25,9 +24,6 @@ API будет доступно по адресу `http://localhost:8080`.
 - можете повторить верхний пост чтобы увидеть что время занято
 
 ## Запуск тестов
-docker-compose run --rm tests
+-`make test`
 
-## Структура проекта
 
-- `cmd/api`: Основная точка входа приложения
-- `internal/api`: Обработчики API и маршрутизатор

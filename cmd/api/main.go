@@ -2,32 +2,45 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"time"
 
 	"github.com/alinurmyrzakhanov/conference-room-booking/internal/api/handlers"
-	"github.com/alinurmyrzakhanov/conference-room-booking/internal/repository/postgres"
+	"github.com/alinurmyrzakhanov/conference-room-booking/internal/config"
+	repository "github.com/alinurmyrzakhanov/conference-room-booking/internal/repository/postgres"
 	"github.com/alinurmyrzakhanov/conference-room-booking/internal/service"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 func main() {
-	dbURL := os.Getenv("DATABASE_URL")
-	if dbURL == "" {
-		dbURL = "postgres://user:password@localhost:5432/conference_booking?sslmode=disable"
-	}
-	dbPool, err := pgxpool.Connect(context.Background(), dbURL)
+	// Загрузка конфигурации
+	cfg := config.NewConfig()
+
+	// Подключение к базе данных
+	dbPool, err := pgxpool.Connect(context.Background(), cfg.DBUrl)
 	if err != nil {
-		log.Fatalf("не получается подклюиться к базе: %v", err)
+		log.Fatalf("Не удается подключиться к базе: %v", err)
 	}
 	defer dbPool.Close()
 
-	reservationRepo := postgres.NewReservationRepository(dbPool)
-	reservationService := service.NewReservationRepository(reservationRepo)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := dbPool.Ping(ctx); err != nil {
+		log.Fatalf("пинг базы данных не прошел: %v", err)
+	}
+
+	// Инициализация репозитория и сервиса
+	reservationRepo := repository.NewReservationRepository(dbPool)
+	reservationService := service.NewReservationService(reservationRepo)
+	// Настройка маршрутизации
 	router := handlers.SetupRouter(reservationService)
-	log.Print("Запускается сервер на :8080")
-	if err := http.ListenAndServe(":8080", router); err != nil {
+
+	// Запуск сервера
+	serverAddr := fmt.Sprintf(":%d", cfg.ServerPort)
+	log.Printf("Запускается сервер на %s", serverAddr)
+	if err := http.ListenAndServe(serverAddr, router); err != nil {
 		log.Fatalf("Не удалось запустить сервер: %v", err)
 	}
 }
