@@ -5,7 +5,7 @@
 ## Запуск приложения
 
 1. Скачайте себе репо:
-git clone https://github.com/alinurmyrzakhanov/conference-room-booking.git
+git clone https://github.com/alinur-rama/conference-room-booking.git
 cd conference-room-booking
 
 2. Запуск приложения:
@@ -21,10 +21,10 @@ API будет доступно по адресу `http://localhost:8080`.
            "end_time": "2024-08-30T11:00:00Z"
          }'
 `: Создание нового бронирования
-- `GET /reservations/room1`: Получение всех бронирований для комнаты
+- `curl -X GET http://localhost:8080/reservations/room1`: Получение всех бронирований для комнаты
+- можете повторить верхний пост чтобы увидеть что время занято
 
 ## Запуск тестов
-docker-compose up --build tests
 docker-compose run --rm tests
 
 ## Структура проекта
