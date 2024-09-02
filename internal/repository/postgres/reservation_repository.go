@@ -53,7 +53,7 @@ func (r *ReservationRepository) GetByRoomID(ctx context.Context, roomID string) 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	query, args, err := squirrel.Select("id", "room_id", "start_time", "end_time").
+	query, args, err := squirrel.Select("room_id", "start_time", "end_time").
 		From("reservations").
 		Where(squirrel.Eq{"room_id": roomID}).
 		PlaceholderFormat(squirrel.Dollar).

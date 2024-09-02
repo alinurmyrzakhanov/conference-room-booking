@@ -21,6 +21,15 @@ services:
     volumes:
       - ./migrations:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
+    
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/conference_booking?sslmode=disable
+    depends_on:
+      - db    
 
 volumes:
   postgres_data:
